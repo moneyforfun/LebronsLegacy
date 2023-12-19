@@ -1,16 +1,25 @@
-# This is a sample Python script.
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+years = list(range(2004,2023))
+url_start = 'https://www.basketball-reference.com/awards/awards_{}.html'
+for year in years:
+    url = url_start.format(year)
+    data = requests.get(url)
+
+    with open('mvp/{}.html'.format(year),'w+', encoding="utf-8") as f:
+        f.write(data.text)
+
+with open('mvp/2005.html') as g:
+    page =g.read()
+soup = BeautifulSoup(page,'html.parser')
+soup.find('tr', class_='over_header').decompose()
+mvp_table = soup.find_all(id='mvp')
+
+mvp_1991 = pd.read_html(str(mvp_table))[0]
+print(mvp_1991)
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+'''soup = BeautifulSoup(page,'html.parser')
+soup.find_all(id='div_pgl_basic')'''
