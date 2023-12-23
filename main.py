@@ -30,7 +30,7 @@ from selenium import webdriver
 driver = webdriver.Chrome()
 import time
 
-for year in years:
+'''for year in years:
     url = player_stats_url.format(year)
 
     driver.get(url)
@@ -39,7 +39,17 @@ for year in years:
 
     html = driver.page_source
     with open('player/{}.html'.format(year),'w+',encoding="utf-8") as f:
-        f.write(html)
-
+        f.write(html)'''
+dfs = []
+for year in years:
+    with open('player/{}.html'.format(year), 'w+', encoding="utf-8") as f:
+        page = f.read()
+    soup = BeautifulSoup(page, 'html.parser')
+    soup.find('tr', class_='thead').decompose()
+    player_table = soup.find(id='per_game_stats')
+    player = pd.read_html(str(player_table))[0]
+    player['Year'] = year
+    dfs.append(player)
+players = pd.concat(dfs)
 
 
