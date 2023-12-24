@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 
-years = list(range(1991,2021))
+years = list(range(1991, 2022))
 url_start = 'https://www.basketball-reference.com/awards/awards_{}.html'
 
 '''for year in years:
@@ -40,10 +40,11 @@ import time
     html = driver.page_source
     with open('player/{}.html'.format(year),'w+',encoding="utf-8") as f:
         f.write(html)'''
-dfs = []
+'''dfs = []
 for year in years:
-    with open('player/{}.html'.format(year), 'w+', encoding="utf-8") as f:
+    with open('player/{}.html'.format(year), 'r+', encoding="utf-8") as f:
         page = f.read()
+
     soup = BeautifulSoup(page, 'html.parser')
     soup.find('tr', class_='thead').decompose()
     player_table = soup.find(id='per_game_stats')
@@ -51,5 +52,37 @@ for year in years:
     player['Year'] = year
     dfs.append(player)
 players = pd.concat(dfs)
+players.to_csv('players.csv')'''
+
+#division scraping
+'''team_stats_url = 'https://www.basketball-reference.com/leagues/NBA_{}_standings.html'
+for year in years:
+        url = team_stats_url.format(year)
+        data = requests.get(url)
+        with open('team/{}.html'.format(year),'w+',encoding="utf-8") as f:
+                f.write(data.text)'''
+dfs = []
+for year in years:
+        with open('team/{}.html'.format(year),'r+',encoding="utf-8") as f:
+                page = f.read()
+        soup = BeautifulSoup(page, 'html.parser')
+        soup.find('tr', class_='thead').decompose()
+        team_table = soup.find(id='divs_standings')
+        team = pd.read_html(str(team_table))[0]
+        team['Year'] = year
+        team['Team'] = team['Eastern Conference']
+        del team['Eastern Conference']
+        dfs.append(team)
+
+        soup = BeautifulSoup(page, 'html.parser')
+        soup.find('tr', class_='thead').decompose()
+        team_table = soup.find(id='divs_standings')
+        team = pd.read_html(str(team_table))[0]
+        team['Year'] = year
+        team['Team'] = team['Western Conference']
+        del team['Western Conference']
+        dfs.append(team)
+teams = pd.concat(dfs)
+print(teams)
 
 
