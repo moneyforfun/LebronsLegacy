@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 mvps = pd.read_csv('mvps.csv')
 mvps = mvps[['Player','Year','Pts Won','Pts Max','Share']]
 
@@ -51,3 +52,6 @@ stats['GB'] = stats['GB'].str.replace('—','0')
 stats['GB'] = pd.to_numeric(stats['GB'])
 
 stats.to_csv('player_mvp_stats.csv')
+
+highest_scoring = stats[stats['G']> 70].sort_values('PTS',ascending=False).head(10)
+print(highest_scoring.plot.bar('Player','PTS'))
